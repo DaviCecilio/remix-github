@@ -4,10 +4,9 @@ import { useLoaderData } from "@remix-run/react"
 import { GithubContainer, LoaderDataProps, GithubApi } from "~/features/github"
 
 export const loader: LoaderFunction = async ({ params }) => {
-  const user = await GithubApi.getGithubUser(params.username)
-
   return {
-    user,
+    user: await GithubApi.getGithubUser(params.username),
+    repos: await GithubApi.getUserRepos(params.username),
   }
 }
 
@@ -16,7 +15,7 @@ export function ErrorBoundary() {
 }
 
 export default function () {
-  const { user } = useLoaderData<LoaderDataProps>()
+  const { user, repos } = useLoaderData<LoaderDataProps>()
 
-  return <GithubContainer user={user} />
+  return <GithubContainer user={user} repos={repos} />
 }
