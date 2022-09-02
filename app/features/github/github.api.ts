@@ -1,5 +1,6 @@
 import invariant from "tiny-invariant"
-import { Commit, Repo, User } from "./types"
+import pick from 'lodash/pick'
+import { Types } from "."
 
 const config = {
   headers: {
@@ -9,45 +10,40 @@ const config = {
 }
 
 
-export const getGithubUser = async (username?: string): Promise<User> => {
+export const getGithubUser = async (username?: string): Promise<Types.User> => {
   invariant(username, 'Please provide an username as a string')
 
   const res = await fetch(`https://api.github.com/users/${username}`, config)
 
-  const { name, login, avatar_url, html_url, bio } = await res.json()
-
-  return {
-    name,
-    login,
-    avatar_url,
-    html_url,
-    bio,
-  }
+  return pick((await res.json()), ['name', 'login', 'avatar_url', 'html_url', 'bio'])
 }
 
-export const getUserRepos = async (username?: string): Promise<Repo[]> => {
+export const getUserRepos = async (username?: string): Promise<Types.Repositories.Repo[]> => {
   invariant(username, 'Please provide an username as a string')
 
   const res = await fetch(`https://api.github.com/users/${username}/repos`, config)
 
 
-  return (await res.json()).map((repo: Repo) => ({
-    id: repo.id,
-    full_name: repo.full_name,
-    stargazers_count: repo.stargazers_count,
-    html_url: repo.html_url,
-    language: repo.language,
-    name: repo.name
-  }))
+  return (await res.json()).map((repo: Types.Repositories.Repo) =>
+    pick(repo, [
+      "id",
+      "full_name",
+      "stargazers_count",
+      "html_url",
+      "language",
+      "name"
+    ])
+  )
 }
 
-export const getCommits = async (username?: string, reponame?: string): Promise<Commit[]> => {
+export const getCommits = async (username?: string, reponame?: string): Promise<Types.Repository.Commit[]> => {
   invariant(reponame, 'Please provide an reponame as a string')
+  invariant(username, 'Please provide an username as a string')
 
   const res = await fetch(`https://api.github.com/repos/${username}/${reponame}/commits`, config)
 
 
-  return (await res.json()).map((commit: Commit) => ({
+  return (await res.json()).map((commit: Types.Repository.Commit) => ({
     sha: commit.sha,
 
     author: {

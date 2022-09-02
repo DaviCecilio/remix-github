@@ -1,3 +1,3 @@
-export * from './GithubContainer'
-export * as GithubApi from './api'
-export * from './types'
+export * from './components/Repositories'
+export * as GithubApi from './github.api'
+export * as Types from './github.types'

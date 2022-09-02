@@ -1,19 +1,18 @@
 import { LoaderFunction } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
-import { Commit } from "~/features/github"
-import { getCommits } from "~/features/github/api"
+import { Types } from "~/features/github"
+import { GithubApi } from "~/features/github"
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { username, reponame } = params
 
-  return { commits: await getCommits(username, reponame) }
+  return {
+    commits: await GithubApi.getCommits(username, reponame),
+  }
 }
 
-interface LoaderDataProps {
-  commits: Commit[]
-}
 export default function () {
-  const { commits } = useLoaderData<LoaderDataProps>()
+  const { commits } = useLoaderData<Types.Repository.LoaderDataProps>()
 
   return (
     <div className="bg-gray-50 pr-4 sm:pr-6 lg:pr-8 lg:flex-shrink-0 lg:border-l lg:border-gray-200 xl:pr-0">
